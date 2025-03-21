@@ -1,0 +1,23 @@
+<h1>Detalles de la orden</h1>
+
+<div>
+    {{#each orders}}
+        <div>
+            <span>ID:{{order._id}}</span>
+            <p><span>Usuario:</span>{{order.user}}</p>
+            <p><span>Total:</span>${{order.totalPrice}}</p>
+            <p><span>Estado:</span>{{order.status}}</p>
+
+        <h2>Productos</h2>
+        <div>
+            {{#each order.products}}
+            <p><span>Producto:</span>{{this.product.title}}</p>
+            <p><span>Cantidad:</span>{{this.quantity}}</p>
+            {{/each}}
+        </div>
+            
+        </div>
+    {{/each}}
+</div>
+
+<a href="/orders">Volver a las ordenes</a>

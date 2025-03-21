@@ -1,35 +1,36 @@
 import productsModel from "../models/ProductModel.js";
 
 export const getProducts = async (req, res) => {
-  try {
-    const {limit = 10, page = 1, sort, query} = req.query;
-    const filter = query ? {category: query} : {};
+    try {
+        let { limit = 10, page = 1, sort, query } = req.query;
 
-    const options = {
-        limit: parseInt(limit),
-        page: parseInt(page),
-        sort : sort ? {price :sort === "asc" ? 1 : -1} : {},
-    };
+        limit = parseInt(limit) > 0 ? parseInt(limit) : 10;
+        page = parseInt(page) > 0 ? parseInt(page) : 1;
 
-    const products = await productsModel.paginate(filter, options);
+        const filter = query ? { category: query } : {};
 
-    res.json({
-        status: "success",
-        payload: products.docs,
-        totalPages: products.totalPages,
-        prevPage: products.prevPage,
-        nextPage: products.nextPage,
-        page: products.page,
-        hasPrevPage: products.hasPrevPage,
-        hasNextPage: products.hasNextPage,
-        prevLink: products.hasPrevPage ? `/api/products?page=${products.prevPage}` : null,
-        nextLink: products.hasNextPage ? `/api/products?page=${products.nextPage}` : null,
-    });
-    }catch (error){
-        res.status(500).json({status: "error", message: error.message});
-  }
+        const options = {
+            limit,
+            page,
+            sort: sort === "asc" ? { price: 1 } : sort === "desc" ? { price: -1 } : {},
+            lean: true
+        };
+
+        const products = await productsModel.paginate(filter, options);
+
+        res.json({
+            products: products.docs,
+            totalPages: products.totalPages,
+            page: products.page,
+            hasPrevPage: products.hasPrevPage,
+            hasNextPage: products.hasNextPage,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+        });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
+    }
 };
-
 
 export const createProduct = async (req, res) => {
     try {
@@ -41,17 +42,19 @@ export const createProduct = async (req, res) => {
 };
 
 export const getProductById = async (req, res) => {
-    const {cod} = req.params;
+    const { cod } = req.params;
     
     try {
-        const product = await productsModel.findOne({cod});
+        const product = await productsModel.findOne({ cod });
 
         if (!product) {
-            return res.status(404).json({status: "error", message: "Producto no encontrado"});
+            return res.status(404).json({ status: "error", message: "Producto no encontrado" });
         }
-        res.json({status: "success", payload: product});
+
+        res.json({ product });
+        
     } catch (error) {
-        res.status(500).json({status: "error", message: error.message});
+        res.status(500).json({ status: "error", message: error.message });
     }
 };
 
