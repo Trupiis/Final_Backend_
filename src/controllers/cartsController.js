@@ -11,50 +11,49 @@ export const createCart = async (req, res) => {
 };
 
 export const getCartById = async (req, res) => {
-    try{
-        const {cid} = req.params;
+    const { cid } = req.params;
+
+    try {
         const cart = await cartModel.findById(cid).populate("products.product");
 
-        if(!cart){
-            return res.status(404).render("cart", {cart: {products: []}})
+        if (!cart) {
+            return res.status(404).json({ status: "error", message: "Carrito no encontrado" });
         }
 
-        const cartTotal = cart.products.reduce((acc, item ) => acc + item.product.price * item.quantity, 0);
-
-        res.render("cart", {cart, cartTotal});
-    }catch (error){
-        res.status(500).json({status: "error", message: error.message});
+        res.status(200).json({ status: "success", cart });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
     }
 };
 
 export const addProductToCart = async (req, res) => {
+    const { cid, pid } = req.params;  
+    const { quantity } = req.body; 
+
     try {
-        const cartId = req.params.cid; 
-        const productCod = req.params.pid; 
-
-        const cart = await cartModel.findById(cartId);
+        const cart = await cartModel.findById(cid);
         if (!cart) {
-        return res.status(404).json({ status: 'error', message: 'Carrito no encontrado' });
-    }
+            return res.status(404).json({ status: "error", message: "Carrito no encontrado" });
+        }
 
-        const product = await productsModel.findOne({ cod: productCod });
+        const product = await productsModel.findOne({ id: pid });  
         if (!product) {
-        return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
-    }
+            return res.status(404).json({ status: "error", message: "Producto no encontrado" });
+        }
 
         const productInCart = cart.products.find(item => item.product.toString() === product._id.toString());
-  
+        
         if (productInCart) {
-        productInCart.quantity += 1;
+            productInCart.quantity += quantity;
         } else {
-        cart.products.push({ product: product._id, quantity: 1 });
-    }
-  
-    await cart.save();
+            cart.products.push({ product: product._id, quantity });
+        }
 
-    return res.status(200).json({ status: 'success', message: 'Producto agregado al carrito', payload: cart });
+        await cart.save();
+        
+        res.status(200).json({ status: "success", message: "Producto agregado al carrito", cart });
     } catch (error) {
-    return res.status(500).json({ status: 'error', message: error.message });
+        res.status(500).json({ status: "error", message: error.message });
     }
 };
 
