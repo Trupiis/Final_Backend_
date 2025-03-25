@@ -12,4 +12,6 @@ router.get("/products", async (req, res) => {
     }
 });
 
+
+
 export default router;

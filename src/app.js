@@ -4,6 +4,9 @@ import mongoose from "mongoose"
 import dotenv from "dotenv"
 import __dirname from "./utils.js"
 import methodOverride from "method-override";
+import path from "path";
+import expressSession from "express-session"; 
+
 
 import productRouter from "./routes/products.router.js"
 import cartRouter from "./routes/carts.router.js"
@@ -22,10 +25,20 @@ app.use(methodOverride("_method"));
 
 
 app.engine("handlebars", handlebars.engine());
-app.set("views", __dirname + "/views");
+app.set('views', __dirname + '/views');
 app.set("view engine", "handlebars");
 
 app.use(express.static(__dirname + "/public"));
+
+console.log("Ruta absoluta de views:", __dirname + "/views");
+
+app.use(expressSession({
+    secret: 'mysecret',
+    resave: false, 
+    saveUninitialized: false,  
+    cookie: { secure: true }  
+  }));
+  
 
 mongoose.connect(process.env.MONGO_URL)
     .then(()=> console.log("DB is connected"))
@@ -37,7 +50,7 @@ mongoose.connect(process.env.MONGO_URL)
 
     app.use("/api/products", productRouter) //
     app.use("/api/orders", orderRouter)
-    app.use("/api", cartRouter)
+    app.use("/carts", cartRouter)
 
     app.use("/", viewsRouter) //
     

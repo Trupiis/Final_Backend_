@@ -27,8 +27,8 @@ export const getCartById = async (req, res) => {
 };
 
 export const addProductToCart = async (req, res) => {
-    const { cid, pid } = req.params;  
-    const { quantity } = req.body; 
+    const { cid, pid } = req.params;
+    const { quantity } = req.body;
 
     try {
         const cart = await cartModel.findById(cid);
@@ -36,26 +36,29 @@ export const addProductToCart = async (req, res) => {
             return res.status(404).json({ status: "error", message: "Carrito no encontrado" });
         }
 
-        const product = await productsModel.findOne({ id: pid });  
+        // Encuentra el producto por su _id (ajustado según tu base de datos)
+        const product = await productsModel.findById(pid);
         if (!product) {
             return res.status(404).json({ status: "error", message: "Producto no encontrado" });
         }
 
         const productInCart = cart.products.find(item => item.product.toString() === product._id.toString());
-        
+
         if (productInCart) {
+            // Si el producto ya está en el carrito, actualizamos la cantidad
             productInCart.quantity += quantity;
         } else {
+            // Si el producto no está en el carrito, lo agregamos
             cart.products.push({ product: product._id, quantity });
         }
 
         await cart.save();
-        
         res.status(200).json({ status: "success", message: "Producto agregado al carrito", cart });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
     }
 };
+
 
 export const removeProductFromCart = async (req, res) => {
     try {
@@ -131,7 +134,7 @@ export const updateProductQuantity = async (req, res) => {
             return res.status(404).json({ status: "error", message: "Carrito no encontrado" });
         }
 
-        const product = await productsModel.findOne({ cod: pid }); 
+        const product = await productsModel.findOne({ cod: pid });
         if (!product) {
             return res.status(404).json({ status: "error", message: `Producto con cod ${pid} no encontrado` });
         }

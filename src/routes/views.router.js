@@ -1,32 +1,29 @@
-import Router from "express"
-import { getProductViewById } from "../controllers/viewsController.js";
+import express from "express";
+import productsModel from "../models/ProductModel.js";  
 
-const router = Router();
+const router = express.Router();
 
-router.get("/products/:cod", getProductViewById);  
-
-
-
-
-/* router.get("/", async (req, res) => {
-    try{
-        const orders = await orderModel.find().populate("products.product")
-        res.render("orders", {orders})
-    }catch(error){
-        res.status(500).send({status: "error", error: "Error al cargar las ordenes"});
+/* router.get("/products/:cod", async (req, res) => {
+    const {cod} = req.params
+     try {
+        const products = await productsModel.find({cod:Number(cod)}).lean();
+        res.render("productDetail", { products });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
     }
-})
+}); */
 
-router.get("/:oid", async (req, res) => {
-    try{
-        const order = await orderModel.findById(req.params.oid).populate("products.product")
-        if(!order){
-    return res.status(404).send({status: "error", error: "Orden no encontrada"});
-}
-
-    }catch(error){
-        res.status(500).send({status: "error", error: "Error al cargar la orden detallada"});
+router.get("/products/:cod", async (req, res) => {
+    const { cod } = req.params;
+    const cartId = req.session.cartId; // Obtenemos el cartId de la sesión o de la base de datos si es necesario
+    try {
+        const product = await productsModel.findOne({ cod: Number(cod) }).lean();
+        res.render("productDetail", { product, cartId });  // Pasamos cartId a la vista
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
     }
-}) */
+});
+
+
 
 export default router;
