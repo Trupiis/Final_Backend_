@@ -1,5 +1,6 @@
 import express from "express";
 import productsModel from "../models/ProductModel.js";  
+import cartModel from "../models/cartModel.js";
 
 const router = express.Router();
 
@@ -15,14 +16,23 @@ const router = express.Router();
 
 router.get("/products/:cod", async (req, res) => {
     const { cod } = req.params;
-    const cartId = req.session.cartId; // Obtenemos el cartId de la sesión o de la base de datos si es necesario
+
+    if (!req.session.cartId) {
+        const newCart = await cartModel.create({ products: [] });
+        req.session.cartId = newCart._id.toString();
+    }
+
     try {
         const product = await productsModel.findOne({ cod: Number(cod) }).lean();
-        res.render("productDetail", { product, cartId });  // Pasamos cartId a la vista
+        if (!product) {
+            return res.status(404).json({ status: "error", message: "Producto no encontrado" });
+        }
+        res.render("productDetail", { product, cartId: req.session.cartId });  
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });
     }
 });
+
 
 
 

@@ -16,7 +16,8 @@
     "express-session": "^1.18.1",
     "method-override": "^3.0.0",
     "mongoose": "^8.13.0",
-    "mongoose-paginate-v2": "^1.9.0"
+    "mongoose-paginate-v2": "^1.9.0",
+    "sweetalert2": "^11.17.2"
   },
   "type": "module"
 }

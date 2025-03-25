@@ -1,15 +1,16 @@
-{{!-- productDetail.handlebars --}}
 
 <h1>{{product.title}}</h1>
 <p>{{product.description}}</p>
 <span>Price: ${{product.price}}</span>
 <p>Stock: {{product.stock}}</p>
 
-<form action="/cart/{{cartId}}/products/{{product._id}}" method="POST">
-        <label for="quantity">Cantidad:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="{{product.stock}}" value="1" required>
-        <button type="submit" class="btn">Añadir al carrito</button>
-    </form>
-
+<form id="addToCartForm" data-cart-id="{{cartId}}" data-product-id="{{product._id}}" action="/cart/{{cartId}}/products/{{product._id}}" method="POST">
+    <label for="quantity">Cantidad:</label>
+    <input type="number" id="quantity" name="quantity" min="1" max="{{product.stock}}" value="1" required>
+    <button type="submit" class="btn">Añadir al carrito</button>
+</form>
 
 <a href="/products">Volver al catálogo</a>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/index.js"></script>

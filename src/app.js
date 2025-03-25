@@ -50,7 +50,7 @@ mongoose.connect(process.env.MONGO_URL)
 
     app.use("/api/products", productRouter) //
     app.use("/api/orders", orderRouter)
-    app.use("/carts", cartRouter)
+    app.use("/cart", cartRouter);
 
     app.use("/", viewsRouter) //
     

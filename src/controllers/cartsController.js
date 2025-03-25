@@ -36,7 +36,6 @@ export const addProductToCart = async (req, res) => {
             return res.status(404).json({ status: "error", message: "Carrito no encontrado" });
         }
 
-        // Encuentra el producto por su _id (ajustado según tu base de datos)
         const product = await productsModel.findById(pid);
         if (!product) {
             return res.status(404).json({ status: "error", message: "Producto no encontrado" });
@@ -45,10 +44,8 @@ export const addProductToCart = async (req, res) => {
         const productInCart = cart.products.find(item => item.product.toString() === product._id.toString());
 
         if (productInCart) {
-            // Si el producto ya está en el carrito, actualizamos la cantidad
             productInCart.quantity += quantity;
         } else {
-            // Si el producto no está en el carrito, lo agregamos
             cart.products.push({ product: product._id, quantity });
         }
 
